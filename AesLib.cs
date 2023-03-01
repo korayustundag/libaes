@@ -8,7 +8,7 @@ namespace libAES
     /// <summary>
     /// AES Encryption and Decryption Library
     /// </summary>
-    public class AesLib
+    public static class AesLib
     {
 
         /// <summary>
@@ -18,7 +18,7 @@ namespace libAES
         /// <param name="password">Secure Password</param>
         /// <returns>Encrypyed base64 string</returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public string EncryptText(string text, string password)
+        public static string EncryptText(string text, string password)
         {
             // Check arguments.
             if (text == null || text.Length <= 0)
@@ -70,7 +70,7 @@ namespace libAES
         /// <param name="password">Password of ciphertext</param>
         /// <returns>Decryped text</returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public string DecryptText(string encryptedBase64String, string password)
+        public static string DecryptText(string encryptedBase64String, string password)
         {
             // Check arguments.
             if (encryptedBase64String == null || encryptedBase64String.Length <= 0)

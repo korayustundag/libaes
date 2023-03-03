@@ -13,13 +13,13 @@ string encrypted = AesLib.EncryptText(mytext, "your password");
 string mytext = "*****..."; // Base64
 string encrypted = AesLib.DecryptText(mytext, "your password");
 ```
-## File Encryption
+### File Encryption
 ```csharp
 string file = "C:\\dir\\file.docx";
 string encryptedFile = "C:\\dir\\encrypted.docx";
 AesLib.EncryptFile(file, encryptedFile, "your password");
 ```
-## File Decryption
+### File Decryption
 ```csharp
 string encryptedFile = "C:\\dir\\encrypted.docx";
 string file = "C:\\dir\\file.docx";

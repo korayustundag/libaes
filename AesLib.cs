@@ -10,7 +10,6 @@ namespace libAES
     /// </summary>
     public static class AesLib
     {
-
         /// <summary>
         /// Encrypt text with password
         /// </summary>
@@ -64,7 +63,7 @@ namespace libAES
         }
 
         /// <summary>
-        /// Decrypt, encrypted text
+        /// Decrypt encrypted text
         /// </summary>
         /// <param name="encryptedBase64String">Encrypted Base64 String</param>
         /// <param name="password">Password of ciphertext</param>
@@ -115,6 +114,128 @@ namespace libAES
                 }
             }
             return plaintext;
+        }
+
+        /// <summary>
+        /// Encrypt file with AES Algorithm
+        /// </summary>
+        /// <param name="sourceFilePath">A relative or absolute path.</param>
+        /// <param name="destinationFilePath">A relative or absolute path.</param>
+        /// <param name="password">Set a password for the file to be encrypted.</param>
+        /// <exception cref="FileNotFoundException"></exception>
+        /// <exception cref="UnauthorizedAccessException"></exception>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="CryptographicException"></exception>
+        public static void EncryptFile(string sourceFilePath, string destinationFilePath, string password)
+        {
+            if (sourceFilePath == null || sourceFilePath.Length <= 0)
+            {
+                throw new ArgumentNullException("sourceFilePath");
+            }
+            if (destinationFilePath == null || destinationFilePath.Length <= 0)
+            {
+                throw new ArgumentNullException("destinationFilePath");
+            }
+            if (password == null || password.Length <= 0)
+            {
+                throw new ArgumentNullException("password");
+            }
+            try
+            {
+                using (FileStream sourceFileStream = new FileStream(sourceFilePath, FileMode.Open, FileAccess.Read))
+                {
+                    using (FileStream destinationFileStream = new FileStream(destinationFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                    {
+                        using (Aes aesAlg = Aes.Create())
+                        {
+                            using (SHA256 sha = SHA256.Create())
+                            {
+                                aesAlg.Key = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
+                            }
+                            using (MD5 md = MD5.Create())
+                            {
+                                aesAlg.IV = md.ComputeHash(Encoding.UTF8.GetBytes(password));
+                            }
+                            using (CryptoStream cs = new CryptoStream(destinationFileStream, aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV), CryptoStreamMode.Write))
+                            {
+                                int data;
+                                while ((data = sourceFileStream.ReadByte()) != -1)
+                                {
+                                    cs.WriteByte((byte)data);
+                                }
+                                sourceFileStream.Close();
+                                cs.Close();
+                                destinationFileStream.Close();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        /// <summary>
+        /// Decrypt encrypted file with AES
+        /// </summary>
+        /// <param name="sourceFilePath">A relative or absolute path.</param>
+        /// <param name="destinationFilePath">A relative or absolute path.</param>
+        /// <param name="password">Enter the password of the encrypted file.</param>
+        /// <exception cref="FileNotFoundException"></exception>
+        /// <exception cref="UnauthorizedAccessException"></exception>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="CryptographicException"></exception>
+        public static void DecryptFile(string sourceFilePath, string destinationFilePath, string password)
+        {
+            if (sourceFilePath == null || sourceFilePath.Length <= 0)
+            {
+                throw new ArgumentNullException("sourceFilePath");
+            }
+            if (destinationFilePath == null || destinationFilePath.Length <= 0)
+            {
+                throw new ArgumentNullException("destinationFilePath");
+            }
+            if (password == null || password.Length <= 0)
+            {
+                throw new ArgumentNullException("password");
+            }
+            try
+            {
+                using (FileStream sourceFileStream = new FileStream(sourceFilePath, FileMode.Open, FileAccess.Read))
+                {
+                    using (FileStream destinationFileStream = new FileStream(destinationFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                    {
+                        using (Aes aesAlg = Aes.Create())
+                        {
+                            using (SHA256 sha = SHA256.Create())
+                            {
+                                aesAlg.Key = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
+                            }
+                            using (MD5 md = MD5.Create())
+                            {
+                                aesAlg.IV = md.ComputeHash(Encoding.UTF8.GetBytes(password));
+                            }
+                            using (CryptoStream cs = new CryptoStream(sourceFileStream, aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV), CryptoStreamMode.Read))
+                            {
+                                int data;
+                                while ((data = cs.ReadByte()) != -1)
+                                {
+                                    destinationFileStream.WriteByte((byte)data);
+                                }
+                                sourceFileStream.Close();
+                                cs.Close();
+                                destinationFileStream.Close();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }
